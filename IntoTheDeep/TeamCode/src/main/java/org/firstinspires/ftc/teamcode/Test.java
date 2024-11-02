@@ -33,7 +33,7 @@ public class Test extends OpMode {
         Motor_Right_Back = hardwareMap.get(DcMotor.class, "Motor_Right_Back");
         Motor_Left_Front = hardwareMap.get(DcMotor.class, "Motor_Left_Front");
         Motor_Left_Back = hardwareMap.get(DcMotor.class, "Motor_Left_Back");
-        Motor_Arm = hardwareMap.get(DcMotor.class, "Motor_Tilt");
+        Motor_Arm = hardwareMap.get(DcMotor.class, "Motor_Arm");
 
         Motor_Right_Front.setDirection(DcMotor.Direction.REVERSE);
         Motor_Left_Front.setDirection(DcMotor.Direction.REVERSE);

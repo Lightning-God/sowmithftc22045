@@ -26,16 +26,28 @@ public class Teleop extends OpMode {
     double Slide_Max_Position_Offset;
     double Slide_Min_Position_Offset;
     double Slide_Max_Position_Real = 1600;
+    //inches = 0.0075ticks + 17
+
+    double Wanted_Vertical_Height;
+    double Wanted_Angle;
 
     double Tilt_Max_Position_Offset;
     double Tilt_Min_Position_Offset;
-    double Tilt_Max_Position_Real = 518;
-    double Tilt_Min_Position_Real = -258.5;
+    double Tilt_Max_Position_Real = 2378;
+    double Tilt_Min_Position_Real = 1189;
+    //26.42222 ticks per degree
+    //Start out with 90 degrees (Motor perfectly vertical)
 
     double Claw_Tilt = 0.7;
     double Claw_Flat = 0;
     double Close = 0.48;
     double Open = 0.2974;
+
+    double High_Basket_Height = 3000;
+    double Low_Basket_Height = 1200;
+    double Low_Chamber_Height = 0;
+    double High_Chamber_Height = 1200;
+
 
     //DriveTrain
     public void moveDriveTrain() {
@@ -78,14 +90,14 @@ public class Teleop extends OpMode {
         Motor_Right_Back = hardwareMap.get(DcMotor.class, "Motor_Right_Back");
         Motor_Left_Front = hardwareMap.get(DcMotor.class, "Motor_Left_Front");
         Motor_Left_Back = hardwareMap.get(DcMotor.class, "Motor_Left_Back");
-        Motor_Tilt = hardwareMap.get(DcMotor.class, "Motor_Tilt");
+        Motor_Tilt = hardwareMap.get(DcMotor.class, "Motor_Arm");
         Motor_Slide = hardwareMap.get(DcMotor.class,"Motor_Slide");
 
         Motor_Right_Back.setDirection(DcMotor.Direction.REVERSE);
         Motor_Left_Back.setDirection(DcMotor.Direction.REVERSE);
 
 
-        Claw_Axis = hardwareMap.get(Servo.class,"Claw_Axis");
+        Claw_Axis = hardwareMap.get(Servo.class,"Claw_Tilt");
         Claw_Open_Close = hardwareMap.get(Servo.class,"Claw_Open_Close");
 
         Slide_Min_Position_Offset = Motor_Slide.getCurrentPosition();
@@ -124,8 +136,16 @@ public class Teleop extends OpMode {
         }
 
         //Arm
-        Motor_Tilt.setPower((gamepad2.left_stick_y)*0.65);
 
+
+
+
+        if ((Motor_Tilt.getCurrentPosition()>=Tilt_Min_Position_Offset && gamepad2.left_stick_y>0) || (Motor_Tilt.getCurrentPosition()<=Slide_Max_Position_Offset && gamepad2.left_stick_y<0))
+            Motor_Tilt.setPower(-gamepad2.left_stick_y*0.5);
+        else {
+            Motor_Tilt.setPower(0);
+            Motor_Tilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
 
 
         if ((Motor_Slide.getCurrentPosition()>=Slide_Min_Position_Offset && gamepad2.right_stick_y>0) || (Motor_Slide.getCurrentPosition()<=Slide_Max_Position_Offset && gamepad2.right_stick_y<0))
@@ -143,7 +163,6 @@ public class Teleop extends OpMode {
             Claw_Axis.setPosition(Claw_Axis.getPosition()+(gamepad2.left_trigger)*0.01);
             Claw_Axis.setPosition(Claw_Axis.getPosition()-(gamepad2.right_trigger)*0.01);
         }
-
         if (gamepad2.b)
             Claw_Open_Close.setPosition(Close);
         if (gamepad2.x)
@@ -151,14 +170,10 @@ public class Teleop extends OpMode {
 
         telemetry.addData("CA:",(Claw_Axis.getPosition()));
         telemetry.addData("COC:",(Claw_Open_Close.getPosition()));
-        telemetry.addData("Slide:",(Motor_Slide.getCurrentPosition()));
+        telemetry.addData("Motor:",(Motor_Slide.getCurrentPosition()));
         telemetry.addData("Difference:",(Motor_Slide.getCurrentPosition()-Slide_Min_Position_Offset));
         telemetry.addData("Tilt:",(Motor_Tilt.getCurrentPosition()));
 
         telemetry.update();
-
-
-
-
     }
 }
